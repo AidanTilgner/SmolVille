@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsx app/index.ts",
     "dev:server": "tsx watch app/index.ts",
-    "dev:client": "node esbuild.dev.mjs",
+    "dev:client": "node esbuild.dev.config.mjs",
     "build": "node esbuild.config.mjs",
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev:client\""
   },
@@ -18,19 +18,19 @@
     "@types/react-dom": "^18.0.11",
     "@types/three": "^0.150.1",
     "concurrently": "^8.0.1",
-    "esbuild": "^0.17.16",
-    "esbuild-sass-plugin": "^2.8.0",
+    "esbuild": "^0.20.2",
+    "esbuild-sass-plugin": "^3.2.0",
     "postcss-modules": "^6.0.0",
     "tsx": "^3.12.6",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@react-three/fiber": "^8.12.1",
+    "babylonjs": "^7.3.1",
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.10.0",
-    "three": "^0.151.3"
+    "react-router-dom": "^6.10.0"
   }
 }

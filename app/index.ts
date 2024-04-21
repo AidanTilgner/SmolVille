@@ -1,6 +1,12 @@
 import Express from "express";
 import os from "os";
+import { config } from "dotenv";
+
+config();
+
 const app = Express();
+
+const PORT = process.env.PORT || 3000;
 
 const currDir = process.cwd();
 
@@ -20,6 +26,6 @@ app.get("/*", (req, res) => {
   res.sendFile(currDir + "/public/index.html");
 });
 
-app.listen(3080, () => {
-  console.log("Server is running on port 3000");
+app.listen(PORT, () => {
+  console.log("Server is running on port 3080");
 });

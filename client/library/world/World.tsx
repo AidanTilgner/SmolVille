@@ -1,19 +1,49 @@
-import React, { useRef, useState } from "react";
-import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, {
+  useLayoutEffect,
+  useRef,
+  useState,
+  useMemo,
+  useEffect,
+} from "react";
 import Styles from "./World.module.scss";
-import Entities from "./Entities";
+import * as B from "babylonjs";
+import { createScene } from "../utils/scene";
 
 function World() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [engine, setEngine] = useState<B.Engine>();
+
+  useLayoutEffect(() => {
+    if (canvasRef.current) {
+      setEngine((prev) => {
+        return new B.Engine(canvasRef.current, false, {
+          preserveDrawingBuffer: true,
+          stencil: true,
+        });
+      });
+    }
+  }, [canvasRef.current]);
+
+  useEffect(() => {
+    if (canvasRef.current && engine) {
+      const scene = createScene(engine, canvasRef.current);
+      engine.runRenderLoop(() => {
+        scene.render();
+      });
+    }
+    const onWindowResize = () => {
+      engine?.resize();
+    };
+    window.addEventListener("resize", onWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", onWindowResize);
+    };
+  }, [engine]);
+
   return (
     <div className={Styles.world}>
-      <Canvas>
-        <ambientLight />
-        <pointLight position={[2, 0, 0]} />
-        <Entities.Box position={[-1.2, 0, 0]} />
-        <Entities.Box position={[1.2, 0, 0]} />
-        <Entities.Platform position={[0, 2, 0]} />
-      </Canvas>
+      <canvas className={Styles.worldCanvas} ref={canvasRef} />
     </div>
   );
 }

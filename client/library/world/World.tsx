@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import Styles from "./World.module.scss";
 import * as B from "babylonjs";
-import { createScene } from "../utils/scene";
+import { createScene } from "./scene/scene";
 
 function World() {
   const canvasRef = useRef<HTMLCanvasElement>(null);

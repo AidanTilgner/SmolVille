@@ -1,30 +1,30 @@
 import * as B from "babylonjs";
 
 export const createScene = (engine: B.Engine, canvas: HTMLCanvasElement) => {
-  // Initialize the scene with the defined engine
   const scene = new B.Scene(engine);
-  // Initialize a camera at location 0, 5, -10, in the above defined scene
+  scene.clearColor = new B.Color4(0, 0, 0, 0.5);
   const camera = new B.FreeCamera("camera1", new B.Vector3(0, 5, -10), scene);
-  // Point the camera at the origin/center of the scene
   camera.setTarget(B.Vector3.Zero());
-  // Attack the camera to the canvas
   camera.attachControl(canvas, false);
 
-  // Create a basic light
   const light = new B.HemisphericLight("light1", new B.Vector3(0, 1, 0), scene);
-  // create a built-in "sphere" shape using the spherebuilder
-  const sphere = B.MeshBuilder.CreateSphere(
-    "sphere1",
+  light.diffuse = B.Color3.FromInts(8, 2, 245);
+  light.intensity = 1;
+  const box = B.MeshBuilder.CreateBox(
+    "box1",
     {
-      segments: 16,
-      diameter: 2,
       sideOrientation: B.Mesh.FRONTSIDE,
+      size: 3,
+      width: 2,
+      height: 2,
     },
     scene
   );
-  // move the sphere
-  sphere.position.y = 1;
-  // create a built-in "ground" shape
+  box.position.y = 1;
+  const boxMaterial = new B.StandardMaterial("sphereMaterial1", scene);
+  boxMaterial.diffuseColor = B.Color3.FromInts(255, 255, 255);
+  box.material = boxMaterial;
+
   const ground = B.MeshBuilder.CreateGround(
     "ground1",
     {
@@ -35,6 +35,9 @@ export const createScene = (engine: B.Engine, canvas: HTMLCanvasElement) => {
     },
     scene
   );
+  const groundMaterial = new B.StandardMaterial("groundMaterial", scene);
+  groundMaterial.diffuseColor = new B.Color3(128 / 255, 128 / 255, 128 / 255);
+  ground.material = groundMaterial;
 
   return scene;
 };

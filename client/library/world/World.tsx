@@ -1,18 +1,12 @@
-import React, {
-  useLayoutEffect,
-  useRef,
-  useState,
-  useMemo,
-  useEffect,
-} from "react";
+import React, { useLayoutEffect, useRef, useState, useEffect } from "react";
 import Styles from "./World.module.scss";
-import * as B from "babylonjs";
-import { createScene } from "./scene/scene";
-import { World, getWorld } from "./world";
+import { World, getWorld } from ".";
 
 function World() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [world, setWorld] = useState<World>();
+
+  console.log("World: ", world);
 
   useLayoutEffect(() => {
     if (canvasRef.current) {

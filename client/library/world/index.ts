@@ -1,4 +1,3 @@
-import { EntityManager } from "./entities/entities";
 import * as B from "babylonjs";
 import { setup } from "./setup";
 import { SystemManager } from "./entities/systems";
@@ -20,6 +19,7 @@ export function getWorld(canvas: HTMLCanvasElement): World {
     stencil: true,
   });
   const scene = new B.Scene(engine);
+  scene.clearColor = new B.Color4(0, 0, 0, 0.5);
   const { entities, systemsManager } = setup(scene);
 
   return {

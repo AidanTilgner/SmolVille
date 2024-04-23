@@ -1,7 +1,9 @@
 import {
+  CameraComponent,
   MaterialComponent,
   MeshComponent,
   PositionComponent,
+  RenderComponent,
 } from "./entities/components";
 import { Entity, EntityManager } from "./entities/entities";
 import {
@@ -9,12 +11,33 @@ import {
   RenderSystem,
   SystemManager,
 } from "./entities/systems";
-import { WorldState } from "./world";
+import { WorldState } from ".";
 import * as B from "babylonjs";
 
 export const entityManager = new EntityManager();
 const worldState: WorldState = {
   frame: 0,
+};
+
+const CameraEntity = (scene: B.Scene) => {
+  const camera = entityManager.createEntity();
+  const cameraComponent = new CameraComponent(
+    entityManager,
+    camera.getId(),
+    {
+      camera: new B.Camera("camera1", new B.Vector3(0, 5, -10)),
+    },
+    worldState
+  );
+  camera.addComponent(cameraComponent);
+
+  const render = new RenderComponent(
+    entityManager,
+    camera.getId(),
+    {},
+    worldState
+  );
+  camera.addComponent(render);
 };
 
 const GroundEntity = () => {
@@ -59,13 +82,21 @@ const GroundEntity = () => {
     128 / 255,
     128 / 255
   );
+
+  const render = new RenderComponent(
+    entityManager,
+    ground.getId(),
+    {},
+    worldState
+  );
+  ground.addComponent(render);
 };
 
-export const entities = [GroundEntity];
+export const entities = [CameraEntity, GroundEntity];
 
 export const setup = (scene: B.Scene) => {
   entities.forEach((e) => {
-    e();
+    e(scene);
   });
 
   const systemsManager = new SystemManager();

@@ -1,5 +1,5 @@
 import * as B from "babylonjs";
-import { WorldState } from "../world";
+import { WorldState } from "..";
 import { EntityManager } from "./entities";
 
 export type IComponentType =
@@ -7,7 +7,8 @@ export type IComponentType =
   | "position"
   | "velocity"
   | "mesh"
-  | "material";
+  | "material"
+  | "camera";
 
 export abstract class Component {
   private type: IComponentType;
@@ -68,6 +69,27 @@ export class RenderComponent extends Component {
       const materialComp = e.getComponent<MaterialComponent>("material");
       meshComp.getMesh().material = materialComp.getMaterial();
     }
+  }
+}
+
+export class CameraComponent extends Component {
+  private camera: B.Camera;
+
+  constructor(
+    entityManager: EntityManager,
+    entityID: number,
+    data: {
+      camera: B.Camera;
+    },
+    worldState: WorldState
+  ) {
+    super(entityManager, entityID, "camera", worldState);
+    const { camera } = data;
+    this.camera = camera;
+  }
+
+  getCamera<T>(): T {
+    return this.camera as T;
   }
 }
 

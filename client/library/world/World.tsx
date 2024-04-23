@@ -8,38 +8,42 @@ import React, {
 import Styles from "./World.module.scss";
 import * as B from "babylonjs";
 import { createScene } from "./scene/scene";
+import { World, getWorld } from "./world";
 
 function World() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [engine, setEngine] = useState<B.Engine>();
+  const [world, setWorld] = useState<World>();
 
   useLayoutEffect(() => {
     if (canvasRef.current) {
-      setEngine((prev) => {
-        return new B.Engine(canvasRef.current, false, {
-          preserveDrawingBuffer: true,
-          stencil: true,
-        });
-      });
+      const world = getWorld(canvasRef.current);
+      setWorld(world);
     }
   }, [canvasRef.current]);
 
   useEffect(() => {
-    if (canvasRef.current && engine) {
-      const scene = createScene(engine, canvasRef.current);
-      engine.runRenderLoop(() => {
-        scene.render();
-      });
+    if (!world) {
+      return;
     }
+
+    let lastFrameTime = performance.now();
+
+    world.engine.runRenderLoop(() => {
+      const now = performance.now();
+      const deltaTime = (now - lastFrameTime) / 1000;
+
+      world.systemsManager.updateAll(deltaTime);
+      world.scene.render();
+    });
     const onWindowResize = () => {
-      engine?.resize();
+      world.engine?.resize();
     };
     window.addEventListener("resize", onWindowResize);
 
     return () => {
       window.removeEventListener("resize", onWindowResize);
     };
-  }, [engine]);
+  }, [world]);
 
   return (
     <div className={Styles.world}>

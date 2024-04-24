@@ -1,6 +1,6 @@
 import * as B from "babylonjs";
 import { setup } from "./setup";
-import { SystemManager } from "./entities/systems";
+import { SystemManager } from "./building/systems";
 
 export interface WorldState {
   frame: number;

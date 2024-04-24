@@ -1,16 +1,17 @@
 import {
   CameraComponent,
+  LightComponent,
   MaterialComponent,
   MeshComponent,
   PositionComponent,
   RenderComponent,
-} from "./entities/components";
-import { Entity, EntityManager } from "./entities/entities";
+} from "./building/components";
+import { EntityManager } from "./building/entities";
 import {
   MovementSystem,
   RenderSystem,
   SystemManager,
-} from "./entities/systems";
+} from "./building/systems";
 import { WorldState } from ".";
 import * as B from "babylonjs";
 
@@ -19,16 +20,22 @@ const worldState: WorldState = {
   frame: 0,
 };
 
-const CameraEntity = (scene: B.Scene) => {
-  const camera = entityManager.createEntity();
+const MainCameraEntity = () => {
+  const camera = entityManager.createEntity({
+    name: "Camera 1",
+  });
   const cameraComponent = new CameraComponent(
     entityManager,
     camera.getId(),
     {
-      camera: new B.Camera("camera1", new B.Vector3(0, 5, -10)),
+      camera: new B.FreeCamera(
+        CameraComponent.getIDFromEntityID(camera.getId()),
+        new B.Vector3(0, 5, -10)
+      ),
     },
     worldState
   );
+  cameraComponent.getCamera<B.FreeCamera>().setTarget(B.Vector3.Zero());
   camera.addComponent(cameraComponent);
 
   const render = new RenderComponent(
@@ -40,8 +47,36 @@ const CameraEntity = (scene: B.Scene) => {
   camera.addComponent(render);
 };
 
+const MainLightEntity = () => {
+  const light = entityManager.createEntity({
+    name: "Light 1",
+  });
+  const lightComponent = new LightComponent(
+    entityManager,
+    light.getId(),
+    {
+      light: new B.HemisphericLight(
+        LightComponent.getIDFromEntityID(light.getId()),
+        new B.Vector3(0, 1, 0)
+      ),
+    },
+    worldState
+  );
+  light.addComponent(lightComponent);
+
+  const render = new RenderComponent(
+    entityManager,
+    light.getId(),
+    {},
+    worldState
+  );
+  light.addComponent(render);
+};
+
 const GroundEntity = () => {
-  const ground = entityManager.createEntity();
+  const ground = entityManager.createEntity({
+    name: "Ground 1",
+  });
   const position = new PositionComponent(
     entityManager,
     ground.getId(),
@@ -58,12 +93,15 @@ const GroundEntity = () => {
     entityManager,
     ground.getId(),
     {
-      mesh: B.MeshBuilder.CreateGround("ground1", {
-        width: 100,
-        height: 2,
-        subdivisions: 10,
-        updatable: false,
-      }),
+      mesh: B.MeshBuilder.CreateGround(
+        MeshComponent.getIDFromEntityID(ground.getId()),
+        {
+          width: 100,
+          height: 2,
+          subdivisions: 10,
+          updatable: false,
+        }
+      ),
     },
     worldState
   );
@@ -92,11 +130,13 @@ const GroundEntity = () => {
   ground.addComponent(render);
 };
 
-export const entities = [CameraEntity, GroundEntity];
+// TODO: HOW CAN I ORGANIZE THIS BETTER?
+
+const entities = [MainCameraEntity, MainLightEntity, GroundEntity];
 
 export const setup = (scene: B.Scene) => {
   entities.forEach((e) => {
-    e(scene);
+    e();
   });
 
   const systemsManager = new SystemManager();

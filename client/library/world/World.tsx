@@ -15,6 +15,8 @@ function World() {
     }
   }, [canvasRef.current]);
 
+  console.log("World: ", world);
+
   useEffect(() => {
     if (!world) {
       return;

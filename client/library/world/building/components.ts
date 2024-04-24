@@ -8,7 +8,9 @@ export type IComponentType =
   | "velocity"
   | "mesh"
   | "material"
-  | "camera";
+  | "camera"
+  | "id"
+  | "light";
 
 export abstract class Component {
   private type: IComponentType;
@@ -52,22 +54,40 @@ export class RenderComponent extends Component {
     if (!e) {
       throw `Error: no entity found on component ${this.getType()}`;
     }
+
+    if (e.hasComponent("camera")) {
+      const cameraComp = e.getComponent<CameraComponent>("camera");
+      if (!cameraComp.isInScene(scene)) {
+        scene.addCamera(cameraComp.getCamera());
+      }
+      return;
+    }
+
+    if (e.hasComponent("light")) {
+      const lightComp = e.getComponent<LightComponent>("light");
+      if (!lightComp.isInScene(scene)) {
+        scene.addLight(lightComp.getLight());
+      }
+      return;
+    }
+
     if (!e.hasComponent("position")) {
-      throw `Error: attempting to render entity which has no position component (${this.getType()})`;
+      throw `Error: attempting to render entity which has no position component (entity: ${e.getName()})`;
     }
     if (!e.hasComponent("mesh")) {
-      throw `Error: attempting to render entity which has no mesh component (${this.getType()})`;
+      throw `Error: attempting to render entity which has no mesh component (entity: ${e.getName()})`;
     }
 
     const meshComp = e.getComponent<MeshComponent>("mesh");
 
-    if (meshComp.getMesh().getScene() !== scene) {
+    if (!meshComp.isInScene(scene)) {
+      console.log("Adding mesh which wasn't previously in scene", e.getName());
       scene.addMesh(meshComp.getMesh());
-    }
 
-    if (e.hasComponent("material")) {
-      const materialComp = e.getComponent<MaterialComponent>("material");
-      meshComp.getMesh().material = materialComp.getMaterial();
+      if (e.hasComponent("material")) {
+        const materialComp = e.getComponent<MaterialComponent>("material");
+        meshComp.getMesh().material = materialComp.getMaterial();
+      }
     }
   }
 }
@@ -86,10 +106,61 @@ export class CameraComponent extends Component {
     super(entityManager, entityID, "camera", worldState);
     const { camera } = data;
     this.camera = camera;
+    if (this.camera.id) {
+      this.camera.id = CameraComponent.getIDFromEntityID(entityID);
+    }
+  }
+
+  static getIDFromEntityID(entityID: number) {
+    return `${entityID}-camera`;
   }
 
   getCamera<T>(): T {
     return this.camera as T;
+  }
+
+  getCameraID() {
+    return this.camera.id;
+  }
+
+  isInScene(scene: B.Scene) {
+    return !!scene.getNodeById(this.getCameraID());
+  }
+}
+
+export class LightComponent extends Component {
+  private light: B.Light;
+
+  constructor(
+    entityManager: EntityManager,
+    entityID: number,
+    data: {
+      light: B.Light;
+    },
+    worldState: WorldState
+  ) {
+    super(entityManager, entityID, "light", worldState);
+    const { light } = data;
+    this.light = light;
+    if (!this.light.id) {
+      this.light.id = LightComponent.getIDFromEntityID(entityID);
+    }
+  }
+
+  static getIDFromEntityID(entityID: number) {
+    return `${entityID}-light`;
+  }
+
+  getLight() {
+    return this.light;
+  }
+
+  getLightId() {
+    return this.light.id;
+  }
+
+  isInScene(scene: B.Scene) {
+    return !!scene.getNodeById(this.getLightId());
   }
 }
 
@@ -107,10 +178,25 @@ export class MeshComponent extends Component {
     super(entityManager, entityID, "mesh", worldState);
     const { mesh } = data;
     this.mesh = mesh;
+    if (!this.mesh.id) {
+      this.mesh.id = MeshComponent.getIDFromEntityID(entityID);
+    }
+  }
+
+  static getIDFromEntityID(entityID: number) {
+    return `${entityID}-mesh`;
   }
 
   getMesh() {
     return this.mesh;
+  }
+
+  getMeshID() {
+    return this.mesh.id;
+  }
+
+  isInScene(scene: B.Scene) {
+    return !!scene.getNodeById(this.getMeshID());
   }
 }
 

@@ -1,26 +1,16 @@
+import * as B from "babylonjs";
+import type { EntityFunction } from "../index.d";
+import { Component } from "../../building/components";
+import { CameraComponent } from "../../building/components/camera";
+import { LightComponent } from "../../building/components/light";
 import {
-  CameraComponent,
-  LightComponent,
   MaterialComponent,
   MeshComponent,
-  PositionComponent,
-  RenderComponent,
-} from "./building/components";
-import { EntityManager } from "./building/entities";
-import {
-  MovementSystem,
-  RenderSystem,
-  SystemManager,
-} from "./building/systems";
-import { WorldState } from ".";
-import * as B from "babylonjs";
+} from "../../building/components/mesh";
+import { PositionComponent } from "../../building/components/position";
+import { RenderComponent } from "../../building/components/render";
 
-export const entityManager = new EntityManager();
-const worldState: WorldState = {
-  frame: 0,
-};
-
-const MainCameraEntity = () => {
+const MainCameraEntity: EntityFunction = (entityManager, worldState) => {
   const camera = entityManager.createEntity({
     name: "Camera 1",
   });
@@ -47,7 +37,7 @@ const MainCameraEntity = () => {
   camera.addComponent(render);
 };
 
-const MainLightEntity = () => {
+const MainLightEntity: EntityFunction = (entityManager, worldState) => {
   const light = entityManager.createEntity({
     name: "Light 1",
   });
@@ -55,14 +45,24 @@ const MainLightEntity = () => {
     entityManager,
     light.getId(),
     {
-      light: new B.HemisphericLight(
+      light: new B.PointLight(
         LightComponent.getIDFromEntityID(light.getId()),
-        new B.Vector3(0, 1, 0)
+        new B.Vector3(0, 0, 0)
       ),
+      type: "PointLight",
     },
     worldState
   );
+  lightComponent.getLight().intensity = 5;
   light.addComponent(lightComponent);
+
+  const positionComponent = new PositionComponent(
+    entityManager,
+    light.getId(),
+    { x: 0, y: 2, z: -10 },
+    worldState
+  );
+  light.addComponent(positionComponent);
 
   const render = new RenderComponent(
     entityManager,
@@ -73,7 +73,7 @@ const MainLightEntity = () => {
   light.addComponent(render);
 };
 
-const GroundEntity = () => {
+const GroundEntity: EntityFunction = (entityManager, worldState) => {
   const ground = entityManager.createEntity({
     name: "Ground 1",
   });
@@ -130,21 +130,8 @@ const GroundEntity = () => {
   ground.addComponent(render);
 };
 
-// TODO: HOW CAN I ORGANIZE THIS BETTER?
-
-const entities = [MainCameraEntity, MainLightEntity, GroundEntity];
-
-export const setup = (scene: B.Scene) => {
-  entities.forEach((e) => {
-    e();
-  });
-
-  const systemsManager = new SystemManager();
-  systemsManager.registerSystem(new MovementSystem(entityManager));
-  systemsManager.registerSystem(new RenderSystem(entityManager, scene));
-
-  return {
-    entities,
-    systemsManager,
-  };
-};
+export const environmentEntities = [
+  MainCameraEntity,
+  MainLightEntity,
+  GroundEntity,
+];

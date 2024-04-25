@@ -1,6 +1,7 @@
 import * as B from "babylonjs";
-import { setup } from "./setup";
+import { setup } from "./worldSrc";
 import { SystemManager } from "./building/systems";
+import { EntityManager } from "./building/entities";
 
 export interface WorldState {
   frame: number;
@@ -9,8 +10,9 @@ export interface WorldState {
 export interface World {
   engine: B.Engine;
   scene: B.Scene;
-  entities: Function[];
+  entityManager: EntityManager;
   systemsManager: SystemManager;
+  worldState: WorldState;
 }
 
 export function getWorld(canvas: HTMLCanvasElement): World {
@@ -20,12 +22,13 @@ export function getWorld(canvas: HTMLCanvasElement): World {
   });
   const scene = new B.Scene(engine);
   scene.clearColor = new B.Color4(0, 0, 0, 0.5);
-  const { entities, systemsManager } = setup(scene);
+  const { worldState, entityManager, systemsManager } = setup(scene);
 
   return {
     engine,
     scene,
-    entities,
+    worldState,
+    entityManager,
     systemsManager,
   };
 }

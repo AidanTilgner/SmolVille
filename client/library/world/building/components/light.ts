@@ -86,7 +86,8 @@ export class LightComponent extends Component {
       this.lightData.type === "DirectionalLight"
     ) {
       const { x, y, z } = coords;
-      return (this.lightData.light.position = new B.Vector3(x, y, z));
+      this.lightData.light.position = new B.Vector3(x, y, z);
+      return;
     }
     throw "Can't update position of light without position property";
   }

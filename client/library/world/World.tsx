@@ -6,16 +6,12 @@ function World() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [world, setWorld] = useState<World>();
 
-  console.log("World: ", world);
-
   useLayoutEffect(() => {
     if (canvasRef.current) {
       const world = getWorld(canvasRef.current);
       setWorld(world);
     }
   }, [canvasRef.current]);
-
-  console.log("World: ", world);
 
   useEffect(() => {
     if (!world) {

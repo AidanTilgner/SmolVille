@@ -3,5 +3,6 @@ import { EntityManager } from "../building/entities";
 
 export type EntityFunction = (
   entityManager: EntityManager,
-  worldState: WorldState
+  worldState: WorldState,
+  canvas: HTMLCanvasElement
 ) => void;

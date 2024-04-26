@@ -22,7 +22,7 @@ export function getWorld(canvas: HTMLCanvasElement): World {
   });
   const scene = new B.Scene(engine);
   scene.clearColor = new B.Color4(0, 0, 0, 0.5);
-  const { worldState, entityManager, systemsManager } = setup(scene);
+  const { worldState, entityManager, systemsManager } = setup(scene, canvas);
 
   return {
     engine,

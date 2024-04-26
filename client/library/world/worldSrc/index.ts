@@ -9,14 +9,14 @@ import * as B from "babylonjs";
 import { environmentEntities } from "./environment";
 import { characterEntities } from "./characters";
 
-export const setup = (scene: B.Scene) => {
+export const setup = (scene: B.Scene, canvas: HTMLCanvasElement) => {
   const entityManager = new EntityManager();
   const worldState: WorldState = {
     frame: 0,
   };
   const allEntities = [...environmentEntities, ...characterEntities];
   allEntities.forEach((e) => {
-    e(entityManager, worldState);
+    e(entityManager, worldState, canvas);
   });
 
   const systemsManager = new SystemManager();

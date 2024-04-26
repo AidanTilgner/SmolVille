@@ -26,7 +26,15 @@ export class RenderComponent extends Component {
     if (e.hasComponent("camera")) {
       const cameraComp = e.getComponent<CameraComponent>("camera");
       if (!cameraComp.isInScene(scene)) {
+        console.log("Adding camera: ", e.getName());
         scene.addCamera(cameraComp.getCamera());
+      }
+      if (e.hasComponent("position")) {
+        const positionComp = e.getComponent<PositionComponent>("position");
+        const position = positionComp.getPosition();
+        if (!cameraComp.hasPosition(position)) {
+          cameraComp.updatePosition(position);
+        }
       }
       return;
     }

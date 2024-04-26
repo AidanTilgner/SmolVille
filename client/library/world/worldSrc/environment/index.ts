@@ -10,7 +10,11 @@ import {
 import { PositionComponent } from "../../building/components/position";
 import { RenderComponent } from "../../building/components/render";
 
-const MainCameraEntity: EntityFunction = (entityManager, worldState) => {
+const MainCameraEntity: EntityFunction = (
+  entityManager,
+  worldState,
+  canvas
+) => {
   const camera = entityManager.createEntity({
     name: "Camera 1",
   });
@@ -20,13 +24,28 @@ const MainCameraEntity: EntityFunction = (entityManager, worldState) => {
     {
       camera: new B.FreeCamera(
         CameraComponent.getIDFromEntityID(camera.getId()),
-        new B.Vector3(0, 5, -10)
+        new B.Vector3(0, 0, 0)
       ),
+      type: "FreeCamera",
     },
     worldState
   );
-  cameraComponent.getCamera<B.FreeCamera>().setTarget(B.Vector3.Zero());
+  const cm = cameraComponent.getCamera<B.FreeCamera>();
+  cm.setTarget(B.Vector3.Zero());
+  cm.attachControl(canvas);
   camera.addComponent(cameraComponent);
+
+  const position = new PositionComponent(
+    entityManager,
+    camera.getId(),
+    {
+      x: 0,
+      y: 5,
+      z: -10,
+    },
+    worldState
+  );
+  camera.addComponent(position);
 
   const render = new RenderComponent(
     entityManager,
